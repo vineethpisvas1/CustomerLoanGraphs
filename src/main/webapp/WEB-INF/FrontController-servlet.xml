@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xsi:schemaLocation="http://www.springframework.org/schema/mvc     
+    http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd  
+	http://www.springframework.org/schema/beans  
+	http://www.springframework.org/schema/beans/spring-beans-3.0.xsd  
+	http://www.springframework.org/schema/context  
+	http://www.springframework.org/schema/context/spring-context-3.0.xsd  
+	http://www.springframework.org/schema/tx  
+	http://www.springframework.org/schema/tx/spring-tx-3.0.xsd">
+	
+	<context:component-scan base-package="com.nucleus" />
+	
+	<!-- to add annotations -->
+	<mvc:annotation-driven />
+	
+	<!-- location for mapping the resources -->
+	<mvc:resources mapping="/resources/**" location="/resources/" />
+	
+	<bean id="ds"
+		class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="url" value="jdbc:oracle:thin:@10.1.50.198:1521:orcl" />
+		<property name="driverClassName" value="oracle.jdbc.driver.OracleDriver" />
+		<property name="username" value="sh" />
+		<property name="password" value="sh" />
+	</bean>
+	<bean
+		class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="prefix" value="/Views/" />
+		<property name="suffix" value=".jsp" />
+	</bean>
+	 <!-- Hibernate 4 SessionFactory Bean definition -->
+	<bean id="sessionFactory"
+		class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+		<property name="dataSource" ref="ds" />
+		<property name="annotatedClasses">
+			<list>
+				<value>com.nucleus.domain.CustomerInfo</value>
+				<value>com.nucleus.domain.LoanInfo</value>
+			</list>
+		</property>
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.dialect">org.hibernate.dialect.Oracle10gDialect</prop>
+				<prop key="hibernate.show_sql">true</prop>
+				<prop key="hibernate.hbm2ddl.auto">update</prop>
+				<prop key="hibernate.temp.use_jdbc_metadata_defaults">false</prop>
+			</props>
+		</property>
+	</bean>
+
+	<!-- transaction manager bean -->
+	<bean id="transactionManager"
+		class="org.springframework.orm.hibernate4.HibernateTransactionManager">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+	
+	<!-- Annotation driven transactions -->
+	<tx:annotation-driven transaction-manager="transactionManager" />
+</beans>

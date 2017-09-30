@@ -1,0 +1,31 @@
+<beans:beans xmlns="http://www.springframework.org/schema/security"
+	xmlns:beans="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+	http://www.springframework.org/schema/security
+	http://www.springframework.org/schema/security/spring-security-3.1.xsd">
+	<http auto-config="true">
+		<intercept-url pattern="/loginCheck" access="IS_AUTHENTICATED_ANONYMOUSLY" />
+		<intercept-url pattern="/errorPage" access="IS_AUTHENTICATED_ANONYMOUSLY" />
+		<intercept-url pattern="/logout" access="IS_AUTHENTICATED_ANONYMOUSLY"/>
+		<intercept-url pattern="/*" access="ROLE_ADMIN" />
+		<form-login login-page="/loginCheck"  default-target-url="/checkRole" always-use-default-target="true" authentication-failure-url="/errorPage"/>
+		<access-denied-handler error-page="/accessError"/>
+		<logout logout-success-url="/logout"/>
+	</http>
+	<beans:bean id="dataSource"
+		class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<beans:property name="url"
+			value="jdbc:oracle:thin:@10.1.50.198:1521:orcl" />
+		<beans:property name="driverClassName" value="oracle.jdbc.driver.OracleDriver" />
+		<beans:property name="username" value="sh" />
+		<beans:property name="password" value="sh" />
+	</beans:bean>
+	<authentication-manager>
+		<authentication-provider>
+			<jdbc-user-service data-source-ref="dataSource"
+				users-by-username-query="SELECT username, password, enabled FROM CustomerLoanUsers WHERE username=?"
+				authorities-by-username-query="SELECT username, authority FROM CustomerLoanAuthorities WHERE username=?" />
+		</authentication-provider>
+	</authentication-manager>
+</beans:beans>
